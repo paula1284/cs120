@@ -56,7 +56,7 @@ def countSort(univsize, arr):
         universe.append([])
 
     for elt in arr:
-        universe[elt["pair"][0]].append(elt)
+        universe[elt[0]].append(elt)
 
     sortedArr = []
     for lst in universe:
@@ -81,19 +81,26 @@ def radixSort(univsize, base, arr):
     k = int(math.ceil(math.log(univsize, base)))
     v = []
     arr_with_digit = []
+    digits = []
     for i in range(n):
         v.append(BC(arr[i][0], base, k))
-        arr_with_digit.append({"digit": None, "pair": arr[i], "BC": v[i], "og_index": i})
+        digits.append([0])
+    for i in range(n):
+        arr_with_digit.append((digits[i], (arr[i][1], i)))
     for j in range(k):
         for i in range(n):
-            arr_with_digit[i]["digit"] = v[arr_with_digit[i]["og_index"]][j]
+            digits[i] = v[i][j]
+        for i in range(n):
+            digits_index = arr_with_digit[i][1][1]
+            arr_with_digit[i] = (digits[digits_index], arr_with_digit[i][1])
         arr_with_digit = countSort(base, arr_with_digit)
     result = []
     for i in range(n):
-        b = 1
-        total = 0
+        b, total = 1, 0
         for digit in range(len(v[i])):
-            total = total + v[arr_with_digit[i]["og_index"]][digit] * b
+            total = total + v[arr_with_digit[i][1][1]][digit] * b
             b = b * base
-        result.append((total, arr_with_digit[i]["pair"][1]))
+        result.append((total, arr_with_digit[i][1][0]))
     return result
+
+radixSort(10,8,[(9,8),(6,5),(4,3)])
