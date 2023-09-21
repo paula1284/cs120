@@ -101,6 +101,7 @@ def radixSort(univsize, base, arr):
             total = total + v[arr_with_digit[i][1][1]][digit] * b
             b = b * base
         result.append((total, arr_with_digit[i][1][0]))
+    # print(result)
     return result
 
 # radixSort(30, 6, [(4,4),(9,9),(8,8),(7,7),(21,21)])
