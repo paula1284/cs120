@@ -103,4 +103,4 @@ def radixSort(univsize, base, arr):
         result.append((total, arr_with_digit[i][1][0]))
     return result
 
-radixSort(10,8,[(9,8),(6,5),(4,3)])
+# radixSort(30, 6, [(4,4),(9,9),(8,8),(7,7),(21,21)])
