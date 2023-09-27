@@ -61,7 +61,7 @@ class BinarySearchTree:
         if left_size > ind and self.left is not None:
             return self.left.select(ind)
         if left_size < ind and self.right is not None:
-            return self.right.select(ind)
+            return self.right.select(ind - left_size - 1)
         return None
 
 
@@ -99,7 +99,12 @@ class BinarySearchTree:
             if self.right is None:
                 self.right = BinarySearchTree(self.debugger)
             self.right.insert(key)
-        self.calculate_sizes()
+
+        # Set size to the sizes of the left and right subtrees + 1
+        left_size = self.left.size if self.left is not None else 0
+        right_size = self.right.size if self.right is not None else 0
+        self.size = left_size + right_size + 1
+
         return self
 
     
@@ -127,7 +132,59 @@ class BinarySearchTree:
        11 
     '''
     def rotate(self, direction, child_side):
-        # Your code goes here
+        # Check if BST is None
+        if self == None:
+            return self
+        
+        # If rotation-side child is None, return self
+        A = None
+        if child_side == "L":
+            A = self.left
+        elif child_side == "R":
+            A = self.right
+        if A == None:
+            return self
+        
+        a_size = A.size
+
+        def get_size(t):
+            if t == None:
+                return 0
+            return t.size
+
+        if direction == "L":
+            B = A.right
+            if child_side == "L":
+                self.left = B
+                original_B_left = self.left.left
+                self.left.left = A
+                self.left.left.right = original_B_left
+                self.left.size = a_size
+                self.left.left.size = get_size(self.left.left.left) + get_size(self.left.left.right) + 1
+            elif child_side == "R":
+                self.right = B
+                original_B_left = self.right.left
+                self.right.left = A
+                self.right.left.right = original_B_left
+                self.right.size = a_size
+                self.right.left.size = get_size(self.right.left.left) + get_size(self.right.left.right) + 1
+
+        elif direction == "R":
+            B = A.left
+            if child_side == "L":
+                self.left = B
+                original_B_right = self.left.right
+                self.left.right = A
+                self.left.right.left = original_B_right
+                self.left.size = a_size
+                self.left.right.size = get_size(self.left.right.left) + get_size(self.left.right.right) + 1
+            elif child_side == "R":
+                self.right = B
+                original_B_right = self.right.right
+                self.right.right = A
+                self.right.right.left = original_B_right
+                self.right.size = a_size
+                self.right.right.size = get_size(self.right.right.left) + get_size(self.right.right.right) + 1
         return self
 
     def print_bst(self):
