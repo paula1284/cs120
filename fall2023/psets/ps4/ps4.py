@@ -35,9 +35,31 @@ def QuickSelect(arr, i):
 
     # Feel free to use get_random_index(arr) or get_random_int(start_inclusive, end_inclusive)
     # ... see the helper functions below
-    pass
-    return (0, -1)
-
+    n = len(arr)
+    if n == 0:
+        return None
+    elif n == 1:
+        return arr[0]
+    
+    pivot_index = get_random_index(arr)
+    pivot = arr[pivot_index][0]
+    less_arr = []
+    greater_arr = []
+    equal_arr = []
+    for j in range(n):
+        if arr[j][0] < pivot:
+            less_arr.append(arr[j])
+        elif arr[j][0] > pivot:
+            greater_arr.append(arr[j])
+        else:
+            equal_arr.append(arr[j])
+    less_and_equal_len = len(less_arr) + len(equal_arr)
+    if i < len(less_arr):
+        return QuickSelect(less_arr, i)
+    elif i >= less_and_equal_len:
+        return QuickSelect(greater_arr, i - less_and_equal_len)
+    else:
+        return equal_arr[0]
 
 '''
 Uses MergeSort to resolve a number of queries where each query is to find an key-value pair (Kj, Vj) such that Kj is an i’th smallest key.
@@ -54,9 +76,11 @@ NOTE: This is different from the QuickSelect definition. This function takes in 
 def MergeSortSelect(arr, query_list):
     # Only call MergeSort once
     # ... MergeSort has already been implemented for you (see below)
-    pass
-    return [(0, -1)] * len(query_list)  # replace this line with your return
-
+    sorted_arr = MergeSort(arr)
+    return_list = []
+    for query in query_list:
+        return_list.append(sorted_arr[query])
+    return return_list
 
 ##################################
 #                                #
@@ -67,7 +91,7 @@ def MergeSortSelect(arr, query_list):
 
 def experiments():
     # Edit this parameter
-    k = [1, 1, 1, 1, 1]
+    k = [15, 20, 25, 30, 40]
 
     # Feel free to edit these initial parameters
 
