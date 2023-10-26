@@ -129,9 +129,58 @@ def bfs_2_coloring(G, precolored_nodes=None):
     
     # TODO: Complete this function by implementing two-coloring using the colors 0 and 1.
     # If there is no valid coloring, reset all the colors to None using G.reset_colors()
+    if G.N == 0:
+        return G.colors
+        
+    # BFS to obtain order, considering connected components and not being precolored
+
+    # Use list `seen` to track whether vertices have been seen, and list `BFSorder`
+    # for the order of vertices
+    seen = []
+    for i in range(G.N):
+        if precolored_nodes != None:
+            if i in precolored_nodes:
+                seen.append(True)
+            else:
+                seen.append(False)
+        else:
+            seen.append(False)
+    if False in seen:
+        v0 = seen.index(False)
+    else:
+        return G.colors
+    frontier = set([v0])
+    BFSorder = [v0]
+    while len(frontier) != 0:
+        new_frontier = set()
+        for v in frontier:
+            for u in G.edges[v]:
+                if not seen[u]:
+                    new_frontier.add(u)
+        if len(new_frontier) == 0:
+            frontier = set([seen.index(False)] if (False in seen) else [])
+        else:
+            frontier = new_frontier
+        for v in frontier:
+            seen[v] = True
+            BFSorder.append(v)
+
+    # Attempt to do 2-coloring using the BFS order
+    iterated = []
+    for i in range(len(BFSorder)):
+        # Get the neighbor colors for v_j for v_i where i < j and v_i not precolored
+        neighbor_colors = set([G.colors[u] for u in G.edges[BFSorder[i]] 
+                               if u in iterated and (u not in precolored_nodes if precolored_nodes else True)])
+        iterated.append(BFSorder[i])
+        if len(neighbor_colors) > 1:
+            G.reset_colors()
+            return None
+        elif len(neighbor_colors) == 0 or (1 in neighbor_colors):
+            G.colors[BFSorder[i]] = 0
+        else:
+            G.colors[BFSorder[i]] = 1
     
-    G.reset_colors()
-    return None
+    return G.colors
 
 '''
     Part B: Implement is_independent_set.
@@ -141,7 +190,11 @@ def bfs_2_coloring(G, precolored_nodes=None):
 # Checks if subset is an independent set in G 
 def is_independent_set(G, subset):
     # TODO: Complete this function
-
+    for v in range(len(G.edges)):
+        if v in subset:
+            for u in G.edges[v]:
+                if u in subset:
+                    return False
     return True
 
 '''
@@ -169,9 +222,29 @@ def is_independent_set(G, subset):
 # If no coloring is possible, resets all of G's colors to None and returns None.
 def iset_bfs_3_coloring(G):
     # TODO: Complete this function.
+    # If N < 3 then definitely three-colorable
+    if G.N < 3:
+        color = 0
+        for v in range(G.N):
+            G.colors[v] = color
+            color += 1
+        return G.colors
 
-    G.reset_colors()
-    return None
+    max_combinations = G.N // 3
+    vertices = [v for v in range(G.N)]
+
+    # Try combinations from n // 3 to 1, seeing if they're independent set with the 
+    # rest of the graph 2-colorable
+    for r in range(max_combinations, 0, -1):
+        for subset in combinations(vertices, r):
+            if is_independent_set(G, subset):
+                for v in subset:
+                    G.colors[v] = 2
+                colors = bfs_2_coloring(G, subset)
+                if colors == None:
+                    G.reset_colors()
+                    return None
+                return colors
 
 # Feel free to add miscellaneous tests below!
 if __name__ == "__main__":
